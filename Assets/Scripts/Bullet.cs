@@ -5,18 +5,6 @@ using UnityEngine.Networking;
 
 public class Bullet : MonoBehaviour
 {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-
 	void OnCollisionEnter(Collision collision){
         if(collision.gameObject.layer != 8)
         {
@@ -28,7 +16,7 @@ public class Bullet : MonoBehaviour
                 if (healthScript != null)
                 {
                     healthScript.TakeDamage(10);
-                    Debug.Log("I hit the player " + hit.GetInstanceID() + ": It's health is: " + healthScript.currentHealth + ". Bye from me!!!");
+                    // Debug.Log("I hit the player " + hit.GetInstanceID() + ": It's health is: " + healthScript.currentHealth + ". Bye from me!!!");
                 }
                 Destroy(this.gameObject);
             }

@@ -23,7 +23,7 @@ public class Health : NetworkBehaviour {
 	void Start () {
 		if (isLocalPlayer) {
 			spawnPositions = FindObjectsOfType<NetworkStartPosition> ();
-			Debug.Log ("spawnPositions.length=" + spawnPositions.Length);
+			// Debug.Log ("spawnPositions.length=" + spawnPositions.Length);
 
 		}
 		
