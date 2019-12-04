@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Networking;
 
 public class NPCController : NetworkBehaviour
@@ -10,6 +11,8 @@ public class NPCController : NetworkBehaviour
 
     public Transform leader;
     public NPCController follower;
+
+    private NavMeshAgent navMeshAgent;
 
     private NPCState state;
 
@@ -40,7 +43,7 @@ public class NPCController : NetworkBehaviour
 
     private void Follow()
     {
-
+        navMeshAgent.destination = leader.position;
     }
 
     //
