@@ -18,7 +18,7 @@ public class CameraController : NetworkBehaviour
         if (this.isLocalPlayer)
         {
             GameObject oldCamera = GameObject.FindGameObjectWithTag("MainCamera");
-            Camera newCamera = (Camera)Instantiate(oldCamera.GetComponent<Camera>(), transform.position, Quaternion.identity);
+            Camera newCamera = (Camera)Instantiate(oldCamera.GetComponent<Camera>(), cameraPos.transform.position, Quaternion.identity);
             
             Destroy(oldCamera);
 
@@ -26,7 +26,7 @@ public class CameraController : NetworkBehaviour
             newCamera.enabled = true;
             newCamera.transform.parent = cameraPos.transform;
 
-            //newCamera.transform.localPosition = new Vector3(1.41f, 1, -2.03f);
+            // newCamera.transform.localPosition = new Vector3(1.41f, 1, -2.03f);
             // Debug.Log(Vector3.Distance(transform.position, newCamera.transform.position));
         }
     }
