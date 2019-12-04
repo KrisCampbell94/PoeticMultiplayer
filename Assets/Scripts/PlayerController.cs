@@ -4,13 +4,15 @@ using UnityEngine;
 using UnityEngine.Networking;// <====
 
 public class PlayerController : NetworkBehaviour {
-    public float jumpForce = 10;
+    private float jumpForce = 6;
 
     private Rigidbody rb;
+    private GroundChecker groundChecker;
 
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
+        groundChecker = GetComponent<GroundChecker>();
     }
 	
 	// Update is called once per frame
@@ -32,7 +34,7 @@ public class PlayerController : NetworkBehaviour {
         transform.Translate(hMove, 0, vMove);
         transform.Rotate(0, hRotate, 0);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && groundChecker.isGrounded)
         {
             rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y + jumpForce, rb.velocity.z);
         }
