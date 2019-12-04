@@ -14,10 +14,11 @@ public class PlayerController : NetworkBehaviour {
         rb = GetComponent<Rigidbody>();
         groundChecker = GetComponent<GroundChecker>();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		if (this.isLocalPlayer)
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (this.isLocalPlayer)
         {
             UpdatePlayer();
         }
@@ -40,9 +41,10 @@ public class PlayerController : NetworkBehaviour {
         }
     }
 
-	public override void OnStartLocalPlayer(){
-		transform.Find("Body").GetComponent<MeshRenderer> ().material.color = Color.blue;
+    public override void OnStartLocalPlayer()
+    {
+        transform.Find("Body").GetComponent<MeshRenderer>().material.color = Color.blue;
         transform.Find("Gun").GetComponent<MeshRenderer>().material.color = Color.red;
-	}
+    }
 
 }
