@@ -9,13 +9,13 @@ public class GunController : NetworkBehaviour
     public Transform bulletSpawn;
     public GameObject gun;
 
-    public float shootDelay = 10;
+    public float shootDelay = 1;
     public float bulletSpeed = 30;
     public float bulletDespawnTimer = 4;
 
     private float gunRotateSpeed = 30;
 
-    private float gunRotation = 0f;
+    private float timeAtLastShot = 0;
     
     // Update is called once per frame
     void Update()
@@ -33,8 +33,10 @@ public class GunController : NetworkBehaviour
 
         // if (Input.GetAxis ("Fire1")>0) {
         // if (Input.GetKey(KeyCode.Mouse0)) {
-        if (Input.GetButton("Fire1")) {
+        float timeSinceLastShot = Time.time - timeAtLastShot;
+        if (Input.GetButton("Fire1") && timeSinceLastShot >= shootDelay) {
             CmdFire(); //networked fire
+            timeAtLastShot = Time.time;
         }
     }
 

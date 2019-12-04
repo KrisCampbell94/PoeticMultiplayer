@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-public class EnemySpawner : NetworkBehaviour {
+public class NPCSpawner : NetworkBehaviour {
 
     public GameObject enemyPrefab;
     public int numberOfEnemies;

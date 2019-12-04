@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 
 public class CameraController : NetworkBehaviour
 {
+    public GameObject cameraPos;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,9 +24,9 @@ public class CameraController : NetworkBehaviour
 
             //camera_main.SetActive(false);
             newCamera.enabled = true;
-            newCamera.transform.parent = transform;
+            newCamera.transform.parent = cameraPos.transform;
 
-            newCamera.transform.localPosition = new Vector3(1.41f, 1, -2.03f);
+            //newCamera.transform.localPosition = new Vector3(1.41f, 1, -2.03f);
             // Debug.Log(Vector3.Distance(transform.position, newCamera.transform.position));
         }
     }
