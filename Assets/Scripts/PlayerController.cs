@@ -3,19 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;// <====
 
-public class PlayerController : NetworkBehaviour {
+public class PlayerController : NetworkBehaviour
+{
     public float jumpForce = 10;
 
     private Rigidbody rb;
 
     // Use this for initialization
-    void Start () {
-        rb = GetComponent<Rigidbody>();
+    void Start()
+    {
+        if (this.isLocalPlayer)
+        {
+            rb = GetComponent<Rigidbody>();
+        }
     }
-	
-	// Update is called once per frame
-	void Update () {
-		if (this.isLocalPlayer)
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (this.isLocalPlayer)
         {
             UpdatePlayer();
         }
@@ -38,9 +44,10 @@ public class PlayerController : NetworkBehaviour {
         }
     }
 
-	public override void OnStartLocalPlayer(){
-		transform.Find("Body").GetComponent<MeshRenderer> ().material.color = Color.blue;
+    public override void OnStartLocalPlayer()
+    {
+        transform.Find("Body").GetComponent<MeshRenderer>().material.color = Color.blue;
         transform.Find("Gun").GetComponent<MeshRenderer>().material.color = Color.red;
-	}
+    }
 
 }
