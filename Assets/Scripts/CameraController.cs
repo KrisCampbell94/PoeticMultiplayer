@@ -25,7 +25,7 @@ public class CameraController : NetworkBehaviour
             newCamera.transform.parent = transform;
 
             newCamera.transform.localPosition = new Vector3(1.41f, 1, -2.03f);
-            Debug.Log(Vector3.Distance(transform.position, newCamera.transform.position));
+            // Debug.Log(Vector3.Distance(transform.position, newCamera.transform.position));
         }
     }
 }
