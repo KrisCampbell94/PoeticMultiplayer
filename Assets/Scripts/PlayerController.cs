@@ -54,14 +54,20 @@ public class PlayerController : NetworkBehaviour {
     }
 	[Command]
 	void CmdFire(){
-		var bullet=Instantiate(bulletPrefab, bulletSpawn.position, this.transform.localRotation);	
+		var bullet=Instantiate(bulletPrefab, bulletSpawn.position, this.transform.localRotation);
+        if (this.isLocalPlayer)
+        {
+            bullet.GetComponent<MeshRenderer>().material.color = Color.blue;
+        }
 		bullet.GetComponent<Rigidbody> ().velocity = gun.transform.up * bulletSpeed ;
 		NetworkServer.Spawn (bullet);
 		Destroy (bullet, bulletTimer);
 	}
 
 	public override void OnStartLocalPlayer(){
-		this.GetComponent<MeshRenderer> ().material.color = Color.blue;
+		transform.Find("Body").GetComponent<MeshRenderer> ().material.color = Color.blue;
+        transform.Find("Gun").GetComponent<MeshRenderer>().material.color = Color.red;
+
 	}
 
     void CameraUpdate()
