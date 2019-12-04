@@ -9,23 +9,31 @@ public class NPCController : NetworkBehaviour
 {
     public enum NPCState { Patrol, Follow }
 
+    public PlayerAllyController playerAllyController;
     public Transform leader;
     public NPCController follower;
+    public NPCState state = NPCState.Patrol;
 
     private NavMeshAgent navMeshAgent;
-
-    private NPCState state;
 
     // Start is called before the first frame update
     void Start()
     {
-        state = NPCState.Patrol;
+        navMeshAgent = GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        switch (state)
+        if (isServer)
+        {
+            UpdateNPC();
+        }
+    }
+
+    private void UpdateNPC()
+    {
+        switch (this.state)
         {
             case NPCState.Patrol:
                 Patrol();
@@ -44,20 +52,5 @@ public class NPCController : NetworkBehaviour
     private void Follow()
     {
         navMeshAgent.destination = leader.position;
-    }
-
-    //
-
-    public void SetLeader(Transform target)
-    {
-        state = NPCState.Follow;
-        this.leader = target;
-    }
-
-    public void ClearLeader()
-    {
-        state = NPCState.Patrol;
-        this.follower.SetLeader(this.leader);
-        this.leader = null;
     }
 }
