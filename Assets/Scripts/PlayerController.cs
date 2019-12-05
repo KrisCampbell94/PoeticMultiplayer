@@ -43,11 +43,4 @@ public class PlayerController : NetworkBehaviour {
 		// Stabilize
 		rBody.angularVelocity = new Vector3(0,0,0);
     }
-
-    public override void OnStartLocalPlayer()
-    {
-        transform.Find("Body").GetComponent<MeshRenderer>().material.color = Color.blue;
-        transform.Find("Gun").GetComponent<MeshRenderer>().material.color = Color.red;
-    }
-
 }

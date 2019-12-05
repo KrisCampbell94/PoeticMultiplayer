@@ -9,25 +9,38 @@ public class PlayerAllyController : NetworkBehaviour
 {
 	public GameObject npcPrefab;
 
-	public GameObject lastAlly;
+	public int numAlliesAtStart = 2;
+
+	private GameObject lastAlly;
+
+	private Color color;
 
 	public int allyCount { get; private set; }
 
 	// Start is called before the first frame update
 	void Start() {
+		CmdInitColor();
+
 		if (this.isLocalPlayer) {
 			InitAllies();
 		}
 	}
 
-	void InitAllies() {
-		var ally1 = Instantiate(npcPrefab, this.transform.position, this.transform.rotation);
-		NetworkServer.Spawn(ally1);
-		AddAlly(ally1);
+	[Command]
+	void CmdInitColor() {
+		color = ColorManager.globalInstance.AssignColor();
+		transform.Find("Body").GetComponent<MeshRenderer>().material.color = color;
+	}
 
-		var ally2 = Instantiate(npcPrefab, this.transform.position, this.transform.rotation);
-		NetworkServer.Spawn(ally2);
-		AddAlly(ally2);
+	void InitAllies() {
+		Vector3 pos = this.transform.position;
+		pos.z -= 5;
+
+		for (int i = 1; i <= numAlliesAtStart; i++) {
+			GameObject ally = Instantiate(npcPrefab, pos, this.transform.rotation);
+			NetworkServer.Spawn(ally);
+			AddAlly(ally);
+		}
 	}
 
 	public void AddAlly(GameObject ally) {
@@ -44,13 +57,15 @@ public class PlayerAllyController : NetworkBehaviour
 			allyController.leader = this.transform;
 		}
 
-		allyController.state = NPCState.Follow;
+		allyController.state = NPCState.Follow; // Set ally state
 
-		ally.GetComponent<NavMeshAgent>().speed = 16;
+		ally.GetComponent<NavMeshAgent>().speed = 16; // Set ally speed
 
-		allyController.playerAllyController = this;
-		lastAlly = ally;
-		allyCount++;
+		allyController.visorMeshRenderer.material.color = color; // Set ally color
+
+		allyController.playerAllyController = this; // Add reference self
+		lastAlly = ally; // Store reference to last ally
+		allyCount++; // Keep track of total allies
 	}
 
 	public void RemoveAlly(GameObject ally) {
@@ -73,12 +88,13 @@ public class PlayerAllyController : NetworkBehaviour
 
 			allyController.leader = null; // Set no leader for self
 
-			allyController.state = NPCState.Patrol;
+			allyController.state = NPCState.Patrol; // Set ally state
 
-			ally.GetComponent<NavMeshAgent>().speed = 8;
+			ally.GetComponent<NavMeshAgent>().speed = 8; // Set ally speed
 
-			allyController.playerAllyController = null;
-			allyCount--;
+			allyController.playerAllyController = null; // Remove reference to self
+
+			allyCount--; // Keep track of total allies
 		}
 	}
 

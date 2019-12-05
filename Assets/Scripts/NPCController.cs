@@ -15,10 +15,16 @@ public class NPCController : NetworkBehaviour
 	public Transform leader;
 	public NPCController follower;
 
+	public MeshRenderer visorMeshRenderer;
+
 	private Rigidbody rBody;
 	private NavMeshAgent navMeshAgent;
 
 	private Transform patrolTarget;
+
+	private void Awake() {
+		visorMeshRenderer = transform.Find("Visor").GetComponent<MeshRenderer>();
+	}
 
 	// Start is called before the first frame update
 	void Start() {
