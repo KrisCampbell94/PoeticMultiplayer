@@ -7,50 +7,55 @@ using UnityEngine.Networking;
 
 public class NPCController : NetworkBehaviour
 {
-    public enum NPCState { Patrol, Follow }
+	public enum NPCState { Patrol, Follow }
 
-    public PlayerAllyController playerAllyController;
-    public Transform leader;
-    public NPCController follower;
-    public NPCState state = NPCState.Patrol;
+	public NPCState state = NPCState.Patrol;
 
-    private NavMeshAgent navMeshAgent;
+	public PlayerAllyController playerAllyController;
+	public Transform leader;
+	public NPCController follower;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        navMeshAgent = GetComponent<NavMeshAgent>();
-    }
+	private NavMeshAgent navMeshAgent;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (isServer)
-        {
-            UpdateNPC();
-        }
-    }
+	private Transform patrolTarget;
 
-    private void UpdateNPC()
-    {
-        switch (this.state)
-        {
-            case NPCState.Patrol:
-                Patrol();
-                break;
-            case NPCState.Follow:
-                Follow();
-                break;
-        }
-    }
+	// Start is called before the first frame update
+	void Start() {
+		navMeshAgent = GetComponent<NavMeshAgent>();
+	}
 
-    private void Patrol()
-    {
+	// Update is called once per frame
+	void Update() {
+		if (isServer) {
+			UpdateNPC();
+		}
+	}
 
-    }
+	private void UpdateNPC() {
+		switch (this.state) {
+			case NPCState.Patrol:
+				Patrol();
+				break;
+			case NPCState.Follow:
+				Follow();
+				break;
+		}
+	}
 
-    private void Follow()
-    {
-        navMeshAgent.destination = leader.position;
-    }
+	private void Patrol() {
+		// https://answers.unity.com/questions/324589/how-can-i-tell-when-a-navmesh-has-reached-its-dest.html
+		if (!navMeshAgent.pathPending) {
+			if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance) {
+				if (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f) {
+					// If reached destination, set new target
+					patrolTarget = WaypointManager.globalInstance.GetRandomWayPoint();
+					navMeshAgent.destination = patrolTarget.position;
+				}
+			}
+		}
+	}
+
+	private void Follow() {
+		navMeshAgent.destination = leader.position;
+	}
 }

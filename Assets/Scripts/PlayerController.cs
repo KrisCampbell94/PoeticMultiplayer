@@ -35,7 +35,6 @@ public class PlayerController : NetworkBehaviour {
         transform.Translate(hMove, 0, vMove);
         transform.Rotate(0, hRotate, 0);
 
-		Debug.Log(groundChecker.isGrounded);
         if (Input.GetButton("Jump") && groundChecker.isGrounded)
         {
             rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y + jumpForce, rb.velocity.z);

@@ -5,19 +5,23 @@ using UnityEngine.Networking;
 
 public class Bullet : MonoBehaviour
 {
-	void OnCollisionEnter(Collision collision){
-        if(collision.gameObject.layer != 8)
+	public PlayerAllyController playerAllyController;
+
+	void OnCollisionEnter(Collision collision) {
+		var collisionObj = collision.gameObject;
+
+		// Is not wall
+		if (collisionObj.layer != LayerMask.NameToLayer("Wall"))
         {
-            if (collision.gameObject.tag != "Player" ||
-            !collision.gameObject.GetComponent<PlayerController>().isLocalPlayer)
+			// Is not self
+            if (!collisionObj.GetComponent<PlayerController>().isLocalPlayer)
             {
-                var hit = collision.gameObject;
-                var healthScript = hit.GetComponent<Health>();
-                if (healthScript != null)
-                {
-                    healthScript.TakeDamage(10);
-                    // Debug.Log("I hit the player " + hit.GetInstanceID() + ": It's health is: " + healthScript.currentHealth + ". Bye from me!!!");
-                }
+				// If hit npc, convert it using ally controller
+				if (collisionObj.tag == "NPC") {
+					playerAllyController.OnHitNPC(collisionObj);
+				}
+
+				// Destroy bullet
                 Destroy(this.gameObject);
             }
         }

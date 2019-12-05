@@ -6,83 +6,84 @@ using static NPCController;
 
 public class PlayerAllyController : NetworkBehaviour
 {
-    public GameObject npcPrefab;
+	public GameObject npcPrefab;
 
-    public GameObject lastAlly;
+	public GameObject lastAlly;
 
-    public int allyCount { get; private set; }
+	public int allyCount { get; private set; }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        if (this.isLocalPlayer)
-        {
-            InitAllies();
-        }
-    }
-    
-    void InitAllies()
-    {
-        var ally1 = Instantiate(npcPrefab, this.transform.position, this.transform.rotation);
-        NetworkServer.Spawn(ally1);
-        AddAlly(ally1);
+	// Start is called before the first frame update
+	void Start() {
+		if (this.isLocalPlayer) {
+			InitAllies();
+		}
+	}
 
-        var ally2 = Instantiate(npcPrefab, this.transform.position, this.transform.rotation);
-        NetworkServer.Spawn(ally2);
-        AddAlly(ally2);
-    }
+	void InitAllies() {
+		var ally1 = Instantiate(npcPrefab, this.transform.position, this.transform.rotation);
+		NetworkServer.Spawn(ally1);
+		AddAlly(ally1);
 
-    public void AddAlly(GameObject ally)
-    {
-        NPCController allyController = ally.GetComponent<NPCController>();
+		var ally2 = Instantiate(npcPrefab, this.transform.position, this.transform.rotation);
+		NetworkServer.Spawn(ally2);
+		AddAlly(ally2);
+	}
 
-        // If have any ally,
-        if (lastAlly != null)
-        {
-            // Set as follower of last ally
-            NPCController lastAllyController = lastAlly.GetComponent<NPCController>();
-            lastAllyController.follower = allyController;
-            allyController.leader = lastAlly.transform;
-        } else
-        {
-            // Set as follower of self
-            allyController.leader = this.transform;
-        }
+	public void AddAlly(GameObject ally) {
+		NPCController allyController = ally.GetComponent<NPCController>();
 
-        allyController.state = NPCState.Follow;
+		// If have any ally,
+		if (lastAlly != null) {
+			// Set as follower of last ally
+			NPCController lastAllyController = lastAlly.GetComponent<NPCController>();
+			lastAllyController.follower = allyController;
+			allyController.leader = lastAlly.transform;
+		} else {
+			// Set as follower of self
+			allyController.leader = this.transform;
+		}
 
-        allyController.playerAllyController = this;
-        lastAlly = ally;
-        allyCount++;
-    }
+		allyController.state = NPCState.Follow;
 
-    public void RemoveAlly(GameObject ally)
-    {
-        NPCController allyController = ally.GetComponent<NPCController>();
+		allyController.playerAllyController = this;
+		lastAlly = ally;
+		allyCount++;
+	}
 
-        if (allyController.playerAllyController == this) // Ally of this player
-        {
-            if (ally == lastAlly) // Is last ally
-            {
-                if (allyCount > 1)
-                {
-                    // Set leader as last ally instead of self
-                    lastAlly = allyController.leader.gameObject;
-                } else
-                {
-                    // Lost all allies, do lose condition
-                }
-            } else if (allyController.follower != null) // Is not last and has follower
-            {
-                allyController.follower.leader = allyController.leader; // Set new leader for follower
-            }
+	public void RemoveAlly(GameObject ally) {
+		NPCController allyController = ally.GetComponent<NPCController>();
 
-            allyController.leader = null; // Set no leader for self
+		if (allyController.playerAllyController == this) // Ally of this player
+		{
+			if (ally == lastAlly) // Is last ally
+			{
+				if (allyCount > 1) {
+					// Set leader as last ally instead of self
+					lastAlly = allyController.leader.gameObject;
+				} else {
+					// Lost all allies, do lose condition
+				}
+			} else if (allyController.follower != null) // Is not last and has follower
+			{
+				allyController.follower.leader = allyController.leader; // Set new leader for follower
+			}
 
-            allyController.state = NPCState.Patrol;
+			allyController.leader = null; // Set no leader for self
 
-            allyController.playerAllyController = null;
-            allyCount--;
-        }
-    }
+			allyController.state = NPCState.Patrol;
+
+			allyController.playerAllyController = null;
+			allyCount--;
+		}
+	}
+
+	public void OnHitNPC(GameObject npc) {
+		NPCController npcController = npc.GetComponent<NPCController>();
+
+		if (npcController.playerAllyController == null) { // Not allied
+			AddAlly(npc); // Add to self allies
+		} else if (npcController.playerAllyController != this) { // Allied but not with self
+			npcController.playerAllyController.RemoveAlly(npc); // Remove from other player
+		}
+	}
 }
