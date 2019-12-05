@@ -13,8 +13,9 @@ public class Bullet : MonoBehaviour
 		// Is not wall
 		if (collisionObj.layer != LayerMask.NameToLayer("Wall"))
         {
-			// Is not self
-            if (!collisionObj.GetComponent<PlayerController>().isLocalPlayer)
+			PlayerController playerController = collisionObj.GetComponent<PlayerController>();
+			// Is not player OR is player but not self
+			if (playerController == null || !playerController.isLocalPlayer)
             {
 				// If hit npc, convert it using ally controller
 				if (collisionObj.tag == "NPC") {

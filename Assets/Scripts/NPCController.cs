@@ -15,12 +15,14 @@ public class NPCController : NetworkBehaviour
 	public Transform leader;
 	public NPCController follower;
 
+	private Rigidbody rBody;
 	private NavMeshAgent navMeshAgent;
 
 	private Transform patrolTarget;
 
 	// Start is called before the first frame update
 	void Start() {
+		rBody = GetComponent<Rigidbody>();
 		navMeshAgent = GetComponent<NavMeshAgent>();
 	}
 
@@ -40,6 +42,9 @@ public class NPCController : NetworkBehaviour
 				Follow();
 				break;
 		}
+
+		// Stabilize
+		rBody.angularVelocity = new Vector3(0, 0, 0);
 	}
 
 	private void Patrol() {

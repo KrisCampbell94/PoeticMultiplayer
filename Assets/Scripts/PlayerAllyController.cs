@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Networking;
 using static NPCController;
 
@@ -45,6 +46,8 @@ public class PlayerAllyController : NetworkBehaviour
 
 		allyController.state = NPCState.Follow;
 
+		ally.GetComponent<NavMeshAgent>().speed = 16;
+
 		allyController.playerAllyController = this;
 		lastAlly = ally;
 		allyCount++;
@@ -71,6 +74,8 @@ public class PlayerAllyController : NetworkBehaviour
 			allyController.leader = null; // Set no leader for self
 
 			allyController.state = NPCState.Patrol;
+
+			ally.GetComponent<NavMeshAgent>().speed = 8;
 
 			allyController.playerAllyController = null;
 			allyCount--;

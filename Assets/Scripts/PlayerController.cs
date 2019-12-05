@@ -6,12 +6,12 @@ using UnityEngine.Networking;// <====
 public class PlayerController : NetworkBehaviour {
     private float jumpForce = 6;
 
-    private Rigidbody rb;
+    private Rigidbody rBody;
     private GroundChecker groundChecker;
 
     // Use this for initialization
     void Start () {
-        rb = GetComponent<Rigidbody>();
+        rBody = GetComponent<Rigidbody>();
         groundChecker = GetComponent<GroundChecker>();
     }
 
@@ -37,8 +37,11 @@ public class PlayerController : NetworkBehaviour {
 
         if (Input.GetButton("Jump") && groundChecker.isGrounded)
         {
-            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y + jumpForce, rb.velocity.z);
+            rBody.velocity = new Vector3(rBody.velocity.x, rBody.velocity.y + jumpForce, rBody.velocity.z);
         }
+
+		// Stabilize
+		rBody.angularVelocity = new Vector3(0,0,0);
     }
 
     public override void OnStartLocalPlayer()
