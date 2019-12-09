@@ -8,12 +8,24 @@ public class GameManager : NetworkBehaviour
 	public static GameManager globalInstance;
 
 	public bool loseOnLostAllAllies = true;
+
 	public bool winOnHaveEnoughAllies = true;
 	public int percentAlliesToWin = 50;
+
+	public bool winOnTimer = true;
+	public float secondsPerGame = 120;
+
+	public bool addTimeOnTie = true;
+	public float secondsPerOvertime = 5;
+
+	//
 
 	private List<GameObject> players;
 	public int npcCount = 0;
 	public bool npcSpawningComplete = false;
+
+	private bool gameStarted = false;
+	private float timePassed = 0;
 
 	// Start is called before the first frame update
 	void Start() {
@@ -29,8 +41,46 @@ public class GameManager : NetworkBehaviour
 		players = new List<GameObject>();
 	}
 
+	private void Update() {
+		if (isServer) {
+			if (winOnTimer && gameStarted) {
+				timePassed += Time.deltaTime;
+
+				if (timePassed >= secondsPerGame) { // Game should be over now,
+					// Get most ally count
+					int mostAllies = 0;
+					foreach (GameObject player in players) {
+						int thisPlayerAllyCount = player.GetComponent<PlayerAllyController>().allyCount;
+						if (thisPlayerAllyCount > mostAllies) { // This player has more than previous max
+							mostAllies = thisPlayerAllyCount; // Set new max
+						}
+					}
+
+					// Remove anyone who doesn't have that many allies
+					foreach (GameObject player in players) {
+						int thisPlayerAllyCount = player.GetComponent<PlayerAllyController>().allyCount;
+						if (thisPlayerAllyCount < mostAllies) {
+							PlayerLose(player);
+						}
+					}
+
+					// If there is a tie, add overtime
+					if (players.Count > 1) {
+						secondsPerGame += secondsPerOvertime;
+					}
+				}
+			}
+		}
+	}
+
+	//
+
 	public void PlayerJoin(GameObject player) {
 		players.Add(player);
+
+		if (players.Count >= 2) {
+			gameStarted = true;
+		}
 	}
 
 	public void PlayerLose(GameObject player) {
@@ -74,5 +124,16 @@ public class GameManager : NetworkBehaviour
 	public int GetAlliesToWin() {
 		float multiplier = percentAlliesToWin / 100f;
 		return Mathf.RoundToInt(npcCount * multiplier);
+	}
+
+	public string GetTimeRemaining() {
+		float timerSeconds = secondsPerGame - timePassed;
+
+		// https://answers.unity.com/questions/45676/making-a-timer-0000-minutes-and-seconds.html
+		string minutes = Mathf.Floor(timerSeconds / 60).ToString("00");
+		string seconds = Mathf.RoundToInt(timerSeconds % 60).ToString("00");
+
+		// return minutes + ":" + seconds;
+		return $"{minutes}:{seconds}";
 	}
 }
