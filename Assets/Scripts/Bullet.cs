@@ -3,21 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
-	void OnCollisionEnter(Collision collision){
-        if(collision.gameObject.layer != 8)
+	public PlayerAllyController playerAllyController;
+
+	void OnCollisionEnter(Collision collision) {
+		if (!isServer) {
+			return;
+		}
+
+		var collisionObj = collision.gameObject;
+
+		// Is not wall
+		if (collisionObj.layer != LayerMask.NameToLayer("Wall"))
         {
-            if (collision.gameObject.tag != "Player" ||
-            !collision.gameObject.GetComponent<PlayerController>().isLocalPlayer)
+			PlayerController playerController = collisionObj.GetComponent<PlayerController>();
+			// Is not player OR is player but not self
+			if (playerController == null || !playerController.isLocalPlayer)
             {
-                var hit = collision.gameObject;
-                var healthScript = hit.GetComponent<Health>();
-                if (healthScript != null)
-                {
-                    healthScript.TakeDamage(10);
-                    // Debug.Log("I hit the player " + hit.GetInstanceID() + ": It's health is: " + healthScript.currentHealth + ". Bye from me!!!");
-                }
+				// If hit npc, convert it using ally controller
+				if (collisionObj.tag == "NPC") {
+					playerAllyController.CmdOnHitNPC(collisionObj);
+				}
+
+				// Destroy bullet
                 Destroy(this.gameObject);
             }
         }
