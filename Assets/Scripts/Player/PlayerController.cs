@@ -13,6 +13,7 @@ public class PlayerController : NetworkBehaviour {
     void Start () {
         rBody = GetComponent<Rigidbody>();
         groundChecker = GetComponent<GroundChecker>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -26,7 +27,16 @@ public class PlayerController : NetworkBehaviour {
 
     void UpdatePlayer()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        // Mouse Lock States
+        if (Input.GetButton("Cancel") && Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else if (Input.GetButton("Fire1") && Cursor.lockState == CursorLockMode.None)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
         float vMove = Input.GetAxis("Vertical") * Time.deltaTime * 15;
         float hMove = Input.GetAxis("Horizontal") * Time.deltaTime * 15;
         // float vRotate = (Input.GetAxis("Mouse Y") * Time.deltaTime * 30) *-1;
