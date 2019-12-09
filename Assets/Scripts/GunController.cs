@@ -49,14 +49,17 @@ public class GunController : NetworkBehaviour
     [Command]
     void CmdFire()
     {
-        var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation); // Make new bullet
-        if (this.isLocalPlayer)
-        {
-            bullet.GetComponent<MeshRenderer>().material.color = Color.blue;
-        }
-		bullet.GetComponent<Bullet>().playerAllyController = this.playerAllyController; // Set self as owner
+		var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation); // Make new bullet
 		bullet.GetComponent<Rigidbody>().velocity = gun.transform.up * bulletSpeed; // Set velocity
-        NetworkServer.Spawn(bullet); // Spawn on net
-        Destroy(bullet, bulletDespawnTimer); // Destroy after a while
-    }
+		bullet.GetComponent<Bullet>().playerAllyController = this.playerAllyController; // Set self as owner
+		NetworkServer.Spawn(bullet); // Spawn on net
+		Destroy(bullet, bulletDespawnTimer); // Destroy after a while
+
+		RpcFire(bullet);
+	}
+
+	[ClientRpc]
+	void RpcFire(GameObject bullet) {
+		bullet.GetComponent<MeshRenderer>().material.color = playerAllyController.color; // Set color
+	}
 }

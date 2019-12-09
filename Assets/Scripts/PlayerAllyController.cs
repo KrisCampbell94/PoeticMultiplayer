@@ -13,37 +13,48 @@ public class PlayerAllyController : NetworkBehaviour
 
 	private GameObject lastAlly;
 
-	private Color color;
+	[SyncVar]
+	public Color color;
 
 	public int allyCount { get; private set; }
 
 	// Start is called before the first frame update
 	void Start() {
-		CmdInitColor();
-
 		if (this.isLocalPlayer) {
-			InitAllies();
+			CmdAssignColor();
+			CmdInitAllies();
+		} else {
+			transform.Find("Body").GetComponent<MeshRenderer>().material.color = color;
 		}
 	}
 
 	[Command]
-	void CmdInitColor() {
-		color = ColorManager.globalInstance.AssignColor();
+	void CmdAssignColor() {
+		Color color = ColorManager.globalInstance.GetColor();
+		this.color = color;
+		RpcSetColor(color);
+	}
+
+	[ClientRpc]
+	void RpcSetColor(Color color) {
+		this.color = color;
 		transform.Find("Body").GetComponent<MeshRenderer>().material.color = color;
 	}
 
-	void InitAllies() {
+	[Command]
+	void CmdInitAllies() {
 		Vector3 pos = this.transform.position;
 		pos.z -= 5;
 
 		for (int i = 1; i <= numAlliesAtStart; i++) {
 			GameObject ally = Instantiate(npcPrefab, pos, this.transform.rotation);
 			NetworkServer.Spawn(ally);
-			AddAlly(ally);
+			CmdAddAlly(ally);
 		}
 	}
 
-	public void AddAlly(GameObject ally) {
+	[Command]
+	public void CmdAddAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
 
 		// If have any ally,
@@ -61,14 +72,21 @@ public class PlayerAllyController : NetworkBehaviour
 
 		ally.GetComponent<NavMeshAgent>().speed = 16; // Set ally speed
 
-		allyController.visorMeshRenderer.material.color = color; // Set ally color
-
 		allyController.playerAllyController = this; // Add reference self
 		lastAlly = ally; // Store reference to last ally
 		allyCount++; // Keep track of total allies
+
+		RpcAddAlly(ally);
+	}
+	
+	[ClientRpc]
+	void RpcAddAlly(GameObject ally) {
+		NPCController allyController = ally.GetComponent<NPCController>();
+		allyController.visorMeshRenderer.material.color = color; // Set ally color
 	}
 
-	public void RemoveAlly(GameObject ally) {
+	[Command]
+	public void CmdRemoveAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
 
 		if (allyController.playerAllyController == this) // Ally of this player
@@ -98,13 +116,20 @@ public class PlayerAllyController : NetworkBehaviour
 		}
 	}
 
-	public void OnHitNPC(GameObject npc) {
+	[ClientRpc]
+	void RpcRemoveAlly(GameObject ally) {
+		NPCController allyController = ally.GetComponent<NPCController>();
+		allyController.visorMeshRenderer.material.color = Color.clear;
+	}
+
+	[Command]
+	public void CmdOnHitNPC(GameObject npc) {
 		NPCController npcController = npc.GetComponent<NPCController>();
 
 		if (npcController.playerAllyController == null) { // Not allied
-			AddAlly(npc); // Add to self allies
+			CmdAddAlly(npc); // Add to self allies
 		} else if (npcController.playerAllyController != this) { // Allied but not with self
-			npcController.playerAllyController.RemoveAlly(npc); // Remove from other player
+			npcController.playerAllyController.CmdRemoveAlly(npc); // Remove from other player
 		}
 	}
 }

@@ -18,8 +18,7 @@ public class ColorManager : NetworkBehaviour
 		}
 	}
 
-	[Command]
-	public Color AssignColor() {
+	public Color GetColor() {
 		if (colorPool.Count >= 1) {
 			int index = Random.Range(0, colorPool.Count);
 			Color color = colorPool[index];

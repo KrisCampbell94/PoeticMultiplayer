@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
 	public PlayerAllyController playerAllyController;
 
 	void OnCollisionEnter(Collision collision) {
+		if (!isServer) {
+			return;
+		}
+
 		var collisionObj = collision.gameObject;
 
 		// Is not wall
@@ -19,7 +23,7 @@ public class Bullet : MonoBehaviour
             {
 				// If hit npc, convert it using ally controller
 				if (collisionObj.tag == "NPC") {
-					playerAllyController.OnHitNPC(collisionObj);
+					playerAllyController.CmdOnHitNPC(collisionObj);
 				}
 
 				// Destroy bullet
