@@ -26,6 +26,7 @@ public class GameManager : NetworkBehaviour
 
 	private bool gameStarted = false;
 	private float timeRemaining = 0;
+	public string timeRemainingStr = "00:00";
 
 	// Start is called before the first frame update
 	void Start() {
@@ -46,6 +47,7 @@ public class GameManager : NetworkBehaviour
 			if (winOnTimer && gameStarted) {
 				timeRemaining -= Time.deltaTime;
 				timeRemaining = Mathf.Max(0, timeRemaining);
+				UpdateTimeRemainingStr();
 
 				if (timeRemaining <= 0) { // Game should be over now,
 					// Get most ally count
@@ -131,12 +133,11 @@ public class GameManager : NetworkBehaviour
 		return Mathf.RoundToInt(npcCount * multiplier);
 	}
 
-	public string GetTimeRemaining() {
+	private void UpdateTimeRemainingStr() {
 		// https://answers.unity.com/questions/45676/making-a-timer-0000-minutes-and-seconds.html
 		string minutes = Mathf.Floor(timeRemaining / 60).ToString("00");
 		string seconds = Mathf.RoundToInt(timeRemaining % 60).ToString("00");
 
-		// return minutes + ":" + seconds;
-		return $"{minutes}:{seconds}";
+		timeRemainingStr = $"{minutes}:{seconds}";
 	}
 }

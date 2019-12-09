@@ -51,7 +51,6 @@ public class PlayerAllyController : NetworkBehaviour
 			NetworkServer.Spawn(ally);
 			CmdAddAlly(ally);
 		}
-        PlayerCanvas.playerCanvas.UpdateNPCCount(numAlliesAtStart);
     }
 
 	[Command]
@@ -76,8 +75,6 @@ public class PlayerAllyController : NetworkBehaviour
 		allyController.playerAllyController = this; // Add reference self
 		lastAlly = ally; // Store reference to last ally
 		allyCount++; // Keep track of total allies
-        // Updates the ally count
-        PlayerCanvas.playerCanvas.UpdateNPCCount(allyCount);
 
 		GameManager.globalInstance.GotAlly(this.gameObject, allyCount);
 
