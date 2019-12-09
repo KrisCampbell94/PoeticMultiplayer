@@ -14,12 +14,18 @@ public class GunController : NetworkBehaviour
     public float bulletSpeed = 30;
     public float bulletDespawnTimer = 4;
 
+	private PlayerAllyController playerAllyController;
+
     private float gunRotateSpeed = 30;
 
     private float timeAtLastShot = 0;
-    
-    // Update is called once per frame
-    void Update()
+
+	private void Start() {
+		this.playerAllyController = GetComponent<PlayerAllyController>();
+	}
+
+	// Update is called once per frame
+	void Update()
     {
         if (this.isLocalPlayer)
         {
@@ -59,13 +65,17 @@ public class GunController : NetworkBehaviour
     [Command]
     void CmdFire()
     {
-        var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
-        if (this.isLocalPlayer)
-        {
-            bullet.GetComponent<MeshRenderer>().material.color = Color.blue;
-        }
-        bullet.GetComponent<Rigidbody>().velocity = gun.transform.up * bulletSpeed;
-        NetworkServer.Spawn(bullet);
-        Destroy(bullet, bulletDespawnTimer);
-    }
+		var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation); // Make new bullet
+		bullet.GetComponent<Rigidbody>().velocity = gun.transform.up * bulletSpeed; // Set velocity
+		bullet.GetComponent<Bullet>().playerAllyController = this.playerAllyController; // Set self as owner
+		NetworkServer.Spawn(bullet); // Spawn on net
+		Destroy(bullet, bulletDespawnTimer); // Destroy after a while
+
+		RpcFire(bullet);
+	}
+
+	[ClientRpc]
+	void RpcFire(GameObject bullet) {
+		bullet.GetComponent<MeshRenderer>().material.color = playerAllyController.color; // Set color
+	}
 }
