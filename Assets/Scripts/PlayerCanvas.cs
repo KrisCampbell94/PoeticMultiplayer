@@ -5,10 +5,14 @@ using UnityEngine.UI;
 
 public class PlayerCanvas : MonoBehaviour
 {
-    public Text npcCountText, timerText;
     public static PlayerCanvas playerCanvas;
 
-    private Text timerShadow, npcCountShadow;
+    public GameObject HUD;
+    public GameObject Win;
+    public GameObject Lose;
+
+    public Text npcCountText, timerText;
+    public Text timerShadow, npcCountShadow;
 
     private void Awake()
     {
@@ -17,8 +21,6 @@ public class PlayerCanvas : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        timerShadow = GameObject.Find("TimerCount_Shadow").GetComponent<Text>();
-        npcCountShadow = GameObject.Find("AllyCount_Shadow").GetComponent<Text>();
     }
 
     public void UpdateNPCCount(int alliesHave, int alliesRequired)
@@ -34,5 +36,22 @@ public class PlayerCanvas : MonoBehaviour
 
         timerText.text = $"TIMER: [{minutes}:{seconds}]";
         timerShadow.text = timerText.text;
+    }
+
+    //
+
+    public void ToggleHUD(bool toggle)
+    {
+        HUD.SetActive(toggle);
+    }
+
+    public void ToggleWin(bool toggle)
+    {
+        Win.SetActive(toggle);
+    }
+
+    public void ToggleLose(bool toggle)
+    {
+        Lose.SetActive(toggle);
     }
 }

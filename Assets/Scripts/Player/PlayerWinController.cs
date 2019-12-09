@@ -9,6 +9,7 @@ public class PlayerWinController : NetworkBehaviour
 	private void Start() {
 		if (this.isLocalPlayer) {
 			CmdInitPlayer();
+            PlayerCanvas.playerCanvas.ToggleHUD(true);
 		}
 	}
 
@@ -21,14 +22,16 @@ public class PlayerWinController : NetworkBehaviour
 	[ClientRpc]
 	public void RpcPlayerWin() {
 		if (isLocalPlayer) {
-			SceneManager.LoadScene("Win");
-		}
-	}
+            PlayerCanvas.playerCanvas.ToggleHUD(false);
+            PlayerCanvas.playerCanvas.ToggleWin(true);
+        }
+    }
 
 	[ClientRpc]
 	public void RpcPlayerLose() {
 		if (isLocalPlayer) {
-			SceneManager.LoadScene("Lose");
-		}
-	}
+            PlayerCanvas.playerCanvas.ToggleHUD(false);
+            PlayerCanvas.playerCanvas.ToggleLose(false);
+        }
+    }
 }
