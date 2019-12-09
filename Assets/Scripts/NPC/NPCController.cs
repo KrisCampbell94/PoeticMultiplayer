@@ -17,6 +17,9 @@ public class NPCController : NetworkBehaviour
 
 	public MeshRenderer visorMeshRenderer;
 
+	[SyncVar]
+	public Color visorColor;
+
 	private Rigidbody rBody;
 	private NavMeshAgent navMeshAgent;
 
@@ -30,6 +33,10 @@ public class NPCController : NetworkBehaviour
 	void Start() {
 		rBody = GetComponent<Rigidbody>();
 		navMeshAgent = GetComponent<NavMeshAgent>();
+
+		if (isClient) {
+			visorMeshRenderer.material.color = visorColor;
+		}
 	}
 
 	// Update is called once per frame
@@ -68,5 +75,10 @@ public class NPCController : NetworkBehaviour
 
 	private void Follow() {
 		navMeshAgent.destination = leader.position;
+	}
+
+	public void SetColor(Color color) {
+		this.visorColor = color;
+		this.visorMeshRenderer.material.color = color;
 	}
 }
