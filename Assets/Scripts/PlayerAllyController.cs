@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Networking;
 using static NPCController;
@@ -21,7 +19,7 @@ public class PlayerAllyController : NetworkBehaviour
 	// Start is called before the first frame update
 	void Start() {
 		if (this.isLocalPlayer) {
-			CmdAssignColor();
+			CmdInitPlayer();
 			CmdInitAllies();
 		} else {
 			transform.Find("Body").GetComponent<MeshRenderer>().material.color = color;
@@ -29,7 +27,8 @@ public class PlayerAllyController : NetworkBehaviour
 	}
 
 	[Command]
-	void CmdAssignColor() {
+	void CmdInitPlayer() {
+		// Init player color
 		Color color = ColorManager.globalInstance.GetColor();
 		this.color = color;
 		RpcSetColor(color);
@@ -46,6 +45,7 @@ public class PlayerAllyController : NetworkBehaviour
 		Vector3 pos = this.transform.position;
 		pos.z -= 5;
 
+		GameManager.globalInstance.npcCount += numAlliesAtStart;
 		for (int i = 1; i <= numAlliesAtStart; i++) {
 			GameObject ally = Instantiate(npcPrefab, pos, this.transform.rotation);
 			NetworkServer.Spawn(ally);
@@ -76,13 +76,15 @@ public class PlayerAllyController : NetworkBehaviour
 		lastAlly = ally; // Store reference to last ally
 		allyCount++; // Keep track of total allies
 
+		GameManager.globalInstance.GotAlly(this.gameObject, allyCount);
+
 		RpcAddAlly(ally);
 	}
 	
 	[ClientRpc]
 	void RpcAddAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
-		allyController.visorMeshRenderer.material.color = color; // Set ally color
+		allyController.SetColor(color);
 	}
 
 	[Command]
@@ -93,13 +95,14 @@ public class PlayerAllyController : NetworkBehaviour
 		{
 			if (ally == lastAlly) // Is last ally
 			{
-				if (allyCount > 1) {
+				if (allyCount > 1) { // Have more than just this one
 					// Set leader as last ally instead of self
 					lastAlly = allyController.leader.gameObject;
-				} else {
-					// Lost all allies, do lose condition
+				} else { // This is the last one
+					lastAlly = null;
+					GameManager.globalInstance.LostAllAllies(this.gameObject);
 				}
-			} else if (allyController.follower != null) // Is not last and has follower
+			} else if (allyController.follower != null) // Is not last, has follower
 			{
 				allyController.follower.leader = allyController.leader; // Set new leader for follower
 			}
@@ -113,13 +116,15 @@ public class PlayerAllyController : NetworkBehaviour
 			allyController.playerAllyController = null; // Remove reference to self
 
 			allyCount--; // Keep track of total allies
+
+			RpcRemoveAlly(ally);
 		}
 	}
 
 	[ClientRpc]
 	void RpcRemoveAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
-		allyController.visorMeshRenderer.material.color = Color.clear;
+		allyController.SetColor(Color.clear);
 	}
 
 	[Command]
