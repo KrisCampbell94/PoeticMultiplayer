@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEditor;
 
 public class GunController : NetworkBehaviour
 {
@@ -35,7 +36,22 @@ public class GunController : NetworkBehaviour
     void UpdateGun()
     {
         float vRotate = (Input.GetAxis("Mouse Y") * Time.deltaTime * 30) * -1;
-        gun.transform.Rotate(vRotate, 0, 0);
+        //Debug.Log("Euler Angles: " + gun.transform.eulerAngles);
+        //Debug.Log("Inspector Rotation: " + TransformUtils.GetInspectorRotation(gun.transform));
+        //Debug.Log("Local Euler Angles: " + gun.transform.localEulerAngles);
+        Vector3 gunRotation = TransformUtils.GetInspectorRotation(gun.transform);
+        if (gunRotation.x > 35 && gunRotation.x < 145)
+        {
+            gun.transform.Rotate(vRotate, 0, 0);
+        }
+        else if (gunRotation.x <= 35)
+        {
+            gun.transform.Rotate(0.25f, 0, 0);
+        }
+        else if (gunRotation.x >= 145)
+        {
+            gun.transform.Rotate(-0.25f, 0, 0);
+        }
 
         // if (Input.GetAxis ("Fire1")>0) {
         // if (Input.GetKey(KeyCode.Mouse0)) {
