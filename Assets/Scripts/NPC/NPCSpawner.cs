@@ -5,15 +5,24 @@ using UnityEngine.Networking;
 public class NPCSpawner : NetworkBehaviour
 {
 
-    public GameObject enemyPrefab;
-    public int numberOfEnemies;
+    public GameObject npcPrefab;
+    public int numOfNpcs;
     private GameObject[] wallObjects;
+
+    private void Start()
+    {
+        if (isServer)
+        {
+            GameManager.globalInstance.npcCount += numOfNpcs;
+            GameManager.globalInstance.npcSpawningComplete = true;
+        }
+    }
 
     public override void OnStartServer()
     {
         wallObjects = GameObject.FindGameObjectsWithTag("Wall");
 
-        for (int i = 0; i < numberOfEnemies; i++)
+        for (int i = 0; i < numOfNpcs; i++)
         {
             bool spawnable = true;
             var spawnPosition = new Vector3(Random.Range(-8.0f, 8.0f), 0.0f, Random.Range(-8.0f, 8.0f));
@@ -26,7 +35,7 @@ public class NPCSpawner : NetworkBehaviour
                 //      Without it, some spawns will appear inside the wall
                 if (distance <= (size.x + 4) && distance <= (size.z + 4))
                 {
-                    Debug.Log(wall.name + " Contains Enemy " + i);
+                    // Debug.Log(wall.name + " Contains Enemy " + i);
                     spawnable = false;
                     break;
                 }
@@ -35,7 +44,7 @@ public class NPCSpawner : NetworkBehaviour
             if (spawnable)
             {
                 var spawnRotation = Quaternion.Euler(0.0f, Random.Range(0, 180), 0.0f);
-                var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation, this.transform);
+                var enemy = (GameObject)Instantiate(npcPrefab, spawnPosition, spawnRotation, this.transform);
                 NetworkServer.Spawn(enemy);
             }
             // Try again by deducting the counter by 1
