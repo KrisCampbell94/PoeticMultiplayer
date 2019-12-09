@@ -39,6 +39,7 @@ public class GunController : NetworkBehaviour
         //Debug.Log("Euler Angles: " + gun.transform.eulerAngles);
         //Debug.Log("Inspector Rotation: " + TransformUtils.GetInspectorRotation(gun.transform));
         //Debug.Log("Local Euler Angles: " + gun.transform.localEulerAngles);
+        /*
         Vector3 gunRotation = TransformUtils.GetInspectorRotation(gun.transform);
         if (gunRotation.x > 35 && gunRotation.x < 145)
         {
@@ -52,6 +53,9 @@ public class GunController : NetworkBehaviour
         {
             gun.transform.Rotate(-0.25f, 0, 0);
         }
+        */
+
+        gun.transform.Rotate(vRotate, 0, 0);
 
         // if (Input.GetAxis ("Fire1")>0) {
         // if (Input.GetKey(KeyCode.Mouse0)) {
