@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Networking;
 
 public class NPCSpawner : NetworkBehaviour
