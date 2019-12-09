@@ -21,30 +21,18 @@ public class PlayerCanvas : MonoBehaviour
         npcCountShadow = GameObject.Find("AllyCount_Shadow").GetComponent<Text>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateNPCCount(int alliesHave, int alliesRequired)
     {
-        
-    }
-
-    public void UpdateNPCCount(int number)
-    {
-        npcCountText.text = "ALLY COUNT: " + number.ToString("00");
+        npcCountText.text = $"ALLY COUNT: {alliesHave} / {alliesRequired}";
         npcCountShadow.text = npcCountText.text;
     }
-    public void UpdateTimer(float number)
-    {
-        int seconds = Mathf.FloorToInt(number);
-        int minutes = 0;
-        string timerString = "";
-        while ((seconds -= 60) >= 0)
-        {
-            minutes += 1;
-            seconds -= 60;
-        } 
-        timerString = minutes.ToString("00") + ":" + seconds.ToString("00");
-        timerText.text = "TIMER: [" + timerString + "]";
+
+    public void UpdateTimer(float timeRemaining) {
+		// https://answers.unity.com/questions/45676/making-a-timer-0000-minutes-and-seconds.html
+		string minutes = Mathf.Floor(timeRemaining / 60).ToString("00");
+		string seconds = Mathf.Floor(timeRemaining % 60).ToString("00");
+
+        timerText.text = $"TIMER: [{minutes}:{seconds}]";
         timerShadow.text = timerText.text;
     }
-
 }
