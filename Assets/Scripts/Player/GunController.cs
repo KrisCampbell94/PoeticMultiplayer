@@ -38,17 +38,18 @@ public class GunController : NetworkBehaviour
         float vRotate = (Input.GetAxis("Mouse Y") * Time.deltaTime * 30) * -1;
         //Debug.Log("Euler Angles: " + gun.transform.eulerAngles);
         //Debug.Log("Inspector Rotation: " + TransformUtils.GetInspectorRotation(gun.transform));
-        //Debug.Log("Local Euler Angles: " + gun.transform.localEulerAngles);
-        Vector3 gunRotation = TransformUtils.GetInspectorRotation(gun.transform);
-        if (gunRotation.x > 35 && gunRotation.x < 145)
+        Debug.Log("Local Euler Angles: " + gun.transform.localRotation.eulerAngles);
+        //Vector3 gunRotation = TransformUtils.GetInspectorRotation(gun.transform);
+        Vector3 gunRotation = gun.transform.localRotation.eulerAngles;
+        if (gunRotation.x > 35)
         {
             gun.transform.Rotate(vRotate, 0, 0);
         }
-        else if (gunRotation.x <= 35)
+        else if (gunRotation.x <= 35 && gunRotation.y == 0)
         {
             gun.transform.Rotate(0.25f, 0, 0);
         }
-        else if (gunRotation.x >= 145)
+        else if (gunRotation.x <= 35 && gunRotation.y == 180)
         {
             gun.transform.Rotate(-0.25f, 0, 0);
         }
