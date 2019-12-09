@@ -25,7 +25,7 @@ public class GameManager : NetworkBehaviour
 	public bool npcSpawningComplete = false;
 
 	private bool gameStarted = false;
-	private float timePassed = 0;
+	private float timeRemaining = 0;
 
 	// Start is called before the first frame update
 	void Start() {
@@ -44,9 +44,10 @@ public class GameManager : NetworkBehaviour
 	private void Update() {
 		if (isServer) {
 			if (winOnTimer && gameStarted) {
-				timePassed += Time.deltaTime;
+				timeRemaining -= Time.deltaTime;
+				timeRemaining = Mathf.Max(0, timeRemaining);
 
-				if (timePassed >= secondsPerGame) { // Game should be over now,
+				if (timeRemaining <= 0) { // Game should be over now,
 					// Get most ally count
 					int mostAllies = 0;
 					foreach (GameObject player in players) {
@@ -66,11 +67,16 @@ public class GameManager : NetworkBehaviour
 
 					// If there is a tie, add overtime
 					if (players.Count > 1) {
-						secondsPerGame += secondsPerOvertime;
+						timeRemaining += secondsPerOvertime;
 					}
 				}
 			}
 		}
+	}
+
+	public void StartGame() {
+		timeRemaining = secondsPerGame;
+		gameStarted = true;
 	}
 
 	//
@@ -79,7 +85,7 @@ public class GameManager : NetworkBehaviour
 		players.Add(player);
 
 		if (players.Count >= 2) {
-			gameStarted = true;
+			StartGame();
 		}
 	}
 
@@ -113,7 +119,6 @@ public class GameManager : NetworkBehaviour
 	}
 
 	public void GotAlly(GameObject player, int count) {
-		Debug.Log(count + " " + GetAlliesToWin());
 		if (npcSpawningComplete && (count >= GetAlliesToWin())) {
 			HaveEnoughAlliesToWin(player);
 		}
@@ -127,11 +132,9 @@ public class GameManager : NetworkBehaviour
 	}
 
 	public string GetTimeRemaining() {
-		float timerSeconds = secondsPerGame - timePassed;
-
 		// https://answers.unity.com/questions/45676/making-a-timer-0000-minutes-and-seconds.html
-		string minutes = Mathf.Floor(timerSeconds / 60).ToString("00");
-		string seconds = Mathf.RoundToInt(timerSeconds % 60).ToString("00");
+		string minutes = Mathf.Floor(timeRemaining / 60).ToString("00");
+		string seconds = Mathf.RoundToInt(timeRemaining % 60).ToString("00");
 
 		// return minutes + ":" + seconds;
 		return $"{minutes}:{seconds}";
