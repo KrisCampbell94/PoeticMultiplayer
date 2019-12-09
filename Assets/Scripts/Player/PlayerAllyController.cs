@@ -105,7 +105,12 @@ public class PlayerAllyController : NetworkBehaviour
 				}
 			} else if (allyController.follower != null) // Is not last, has follower
 			{
-				allyController.follower.leader = allyController.leader; // Set new leader for follower
+                NPCController leaderController = allyController.leader.GetComponent<NPCController>(); // Get leaders controller
+                if (leaderController != null) // If leader is actually an NPC
+                {
+                    leaderController.follower = allyController.follower; // Change leader's follower to self follower
+                }
+                allyController.follower.leader = allyController.leader; // Set follower's leader to self leader
 			}
 
 			allyController.leader = null; // Set no leader for self
