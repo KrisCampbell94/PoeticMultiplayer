@@ -79,8 +79,9 @@ public class PlayerAllyController : NetworkBehaviour
 		GameManager.globalInstance.GotAlly(this.gameObject, allyCount);
 
 		RpcAddAlly(ally);
+		RpcUpdateUI_NPC(allyCount, GameManager.globalInstance.GetNumAlliesToWin());
 	}
-	
+
 	[ClientRpc]
 	void RpcAddAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
@@ -118,6 +119,7 @@ public class PlayerAllyController : NetworkBehaviour
 			allyCount--; // Keep track of total allies
 
 			RpcRemoveAlly(ally);
+			RpcUpdateUI_NPC(allyCount, GameManager.globalInstance.GetNumAlliesToWin());
 		}
 	}
 
@@ -135,6 +137,15 @@ public class PlayerAllyController : NetworkBehaviour
 			CmdAddAlly(npc); // Add to self allies
 		} else if (npcController.playerAllyController != this) { // Allied but not with self
 			npcController.playerAllyController.CmdRemoveAlly(npc); // Remove from other player
+		}
+	}
+
+	//
+
+	[ClientRpc]
+	void RpcUpdateUI_NPC(int alliesHave, int alliesRequired) {
+		if (isLocalPlayer) {
+			PlayerCanvas.playerCanvas.UpdateNPCCount(alliesHave, alliesRequired);
 		}
 	}
 }

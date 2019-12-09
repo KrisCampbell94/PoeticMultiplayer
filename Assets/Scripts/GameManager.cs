@@ -47,7 +47,7 @@ public class GameManager : NetworkBehaviour
 			if (winOnTimer && gameStarted) {
 				timeRemaining -= Time.deltaTime;
 				timeRemaining = Mathf.Max(0, timeRemaining);
-				UpdateTimeRemainingStr();
+				RpcUpdateUI_Time(timeRemaining);
 
 				if (timeRemaining <= 0) { // Game should be over now,
 					// Get most ally count
@@ -121,23 +121,20 @@ public class GameManager : NetworkBehaviour
 	}
 
 	public void GotAlly(GameObject player, int count) {
-		if (npcSpawningComplete && (count >= GetAlliesToWin())) {
+		if (npcSpawningComplete && (count >= GetNumAlliesToWin())) {
 			HaveEnoughAlliesToWin(player);
 		}
 	}
 
 	//
 
-	public int GetAlliesToWin() {
+	public int GetNumAlliesToWin() {
 		float multiplier = percentAlliesToWin / 100f;
 		return Mathf.RoundToInt(npcCount * multiplier);
 	}
 
-	private void UpdateTimeRemainingStr() {
-		// https://answers.unity.com/questions/45676/making-a-timer-0000-minutes-and-seconds.html
-		string minutes = Mathf.Floor(timeRemaining / 60).ToString("00");
-		string seconds = Mathf.RoundToInt(timeRemaining % 60).ToString("00");
-
-		timeRemainingStr = $"{minutes}:{seconds}";
+	[ClientRpc]
+	void RpcUpdateUI_Time(float timeRemaining) {
+		PlayerCanvas.playerCanvas.UpdateTimer(timeRemaining);
 	}
 }
