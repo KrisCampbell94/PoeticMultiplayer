@@ -82,7 +82,7 @@ public class PlayerAllyController : NetworkBehaviour
 	[ClientRpc]
 	void RpcAddAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
-		allyController.visorMeshRenderer.material.color = color; // Set ally color
+		allyController.SetColor(color);
 	}
 
 	[Command]
@@ -97,9 +97,10 @@ public class PlayerAllyController : NetworkBehaviour
 					// Set leader as last ally instead of self
 					lastAlly = allyController.leader.gameObject;
 				} else {
+					lastAlly = null;
 					// Lost all allies, do lose condition
 				}
-			} else if (allyController.follower != null) // Is not last and has follower
+			} else if (allyController.follower != null) // Is not last, has follower
 			{
 				allyController.follower.leader = allyController.leader; // Set new leader for follower
 			}
@@ -113,13 +114,15 @@ public class PlayerAllyController : NetworkBehaviour
 			allyController.playerAllyController = null; // Remove reference to self
 
 			allyCount--; // Keep track of total allies
+
+			RpcRemoveAlly(ally);
 		}
 	}
 
 	[ClientRpc]
 	void RpcRemoveAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
-		allyController.visorMeshRenderer.material.color = Color.clear;
+		allyController.SetColor(Color.clear);
 	}
 
 	[Command]
