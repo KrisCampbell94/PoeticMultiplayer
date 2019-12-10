@@ -25,9 +25,6 @@ public class ColorManager : NetworkBehaviour
 			Color color = colorPool[index];
 			usedColors.Add(color);
 			colorPool.Remove(color);
-
-            Debug.Log(color);
-
 			return color;
 		} else {
 			Debug.LogError("No more colors available");
