@@ -9,6 +9,8 @@ public class PlayerAllyController : NetworkBehaviour
 
 	public int numAlliesAtStart = 2;
 
+	public GameObject convertNPCPrefab;
+
 	private GameObject lastAlly;
 
 	[SyncVar]
@@ -86,6 +88,11 @@ public class PlayerAllyController : NetworkBehaviour
 	void RpcAddAlly(GameObject ally) {
 		NPCController allyController = ally.GetComponent<NPCController>();
 		allyController.SetColor(color);
+
+		// Particles
+		GameObject particles = Instantiate(convertNPCPrefab, ally.transform);
+		ParticleSystem.MainModule particlesMain = particles.GetComponent<ParticleSystem>().main;
+		particlesMain.startColor = color;
 	}
 
 	[Command]
@@ -134,8 +141,7 @@ public class PlayerAllyController : NetworkBehaviour
 		allyController.SetColor(Color.clear);
 	}
 
-	[Command]
-	public void CmdOnHitNPC(GameObject npc) {
+	public void OnHitNPC(GameObject npc) {
 		NPCController npcController = npc.GetComponent<NPCController>();
 
 		if (npcController.playerAllyController == null) { // Not allied
