@@ -14,6 +14,8 @@ public class GunController : NetworkBehaviour
     public float bulletSpeed = 30;
     public float bulletDespawnTimer = 4;
 
+	public GameObject muzzleFlashPrefab;
+
 	private PlayerAllyController playerAllyController;
 
     private float gunRotateSpeed = 30;
@@ -69,7 +71,7 @@ public class GunController : NetworkBehaviour
     [Command]
     void CmdFire()
     {
-		var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation); // Make new bullet
+		GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation); // Make new bullet
 		bullet.GetComponent<Rigidbody>().velocity = gun.transform.up * bulletSpeed; // Set velocity
 		bullet.GetComponent<Bullet>().playerAllyController = this.playerAllyController; // Set self as owner
 		NetworkServer.Spawn(bullet); // Spawn on net
@@ -81,5 +83,8 @@ public class GunController : NetworkBehaviour
 	[ClientRpc]
 	void RpcFire(GameObject bullet) {
 		bullet.GetComponent<MeshRenderer>().material.color = playerAllyController.color; // Set color
+
+		// Particles
+		Instantiate(muzzleFlashPrefab, bulletSpawn);
 	}
 }

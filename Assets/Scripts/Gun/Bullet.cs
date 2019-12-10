@@ -22,7 +22,7 @@ public class Bullet : NetworkBehaviour
                     // If hit npc, convert it using ally controller
                     if (collisionObj.tag == "NPC")
                     {
-                        playerAllyController.CmdOnHitNPC(collisionObj);
+                        playerAllyController.OnHitNPC(collisionObj);
                     }
 
                     // Destroy bullet

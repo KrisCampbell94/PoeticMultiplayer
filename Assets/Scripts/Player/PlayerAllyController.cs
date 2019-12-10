@@ -134,8 +134,7 @@ public class PlayerAllyController : NetworkBehaviour
 		allyController.SetColor(Color.clear);
 	}
 
-	[Command]
-	public void CmdOnHitNPC(GameObject npc) {
+	public void OnHitNPC(GameObject npc) {
 		NPCController npcController = npc.GetComponent<NPCController>();
 
 		if (npcController.playerAllyController == null) { // Not allied
